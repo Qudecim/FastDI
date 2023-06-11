@@ -1,6 +1,6 @@
 <?php
 
-namespace Test;
+namespace Example;
 
 class ServiceClass
 {

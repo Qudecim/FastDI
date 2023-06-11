@@ -13,7 +13,7 @@
     "autoload": {
         "psr-4": {
             "DI\\": "src/",
-            "Test\\": "test/"
+            "Example\\": "example/"
         }
     },
     "require": {

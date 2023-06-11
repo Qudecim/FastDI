@@ -2,72 +2,92 @@
 
 namespace DI;
 
-use DI\Definitions\ArrayDefinitions;
 use DI\Definitions\Definition;
-use DI\Proxy\ProxyInstance;
+use DI\Definitions\DefinitionCollection;
 use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface
 {
 
-    private array $definitions;
-    private array $instances = [];
-
     public function __construct(
-        ArrayDefinitions $arrayDefinitions
+        private DefinitionCollection $definitions
     )
     {
-        foreach ($arrayDefinitions->get() as $definitionKey => $definitionValue) {
-            if (gettype($definitionValue) == 'string') {
-                $class = $definitionValue;
-                $callable = function () use ($class) {
-                    return new $class();
-                };
-            } else {
-                $class = $definitionKey;
-                $callable = $definitionValue;
-            }
-            $this->definitions[$class] = new Definition($class, $callable);
-        }
     }
 
+    /**
+     * @param string $id
+     * @return mixed
+     */
     public function get(string $id): mixed
     {
         return $this->definitions[$id];
     }
 
+    /**
+     * @param string $id
+     * @return bool
+     */
     public function has(string $id): bool
     {
         return isset($this->definitions[$id]);
     }
 
-    public function call($class, $callable, $parameters = []): mixed
+    /**
+     * @param string $id
+     * @param $definition
+     * @return void
+     */
+    public function set(string $id, $definition): void
     {
-        $obj = $this->build($class);
-        return $obj->$callable(...$parameters);
+        $this->definitions->add($id, new Definition($id, $definition));
     }
 
-    private function build(string $class): ProxyInstance
+    /**
+     * @param string $class
+     * @param string $callable
+     * @param array $parameters
+     * @return mixed
+     * @throws \ReflectionException
+     */
+    public function call(string $class, string $callable, array $parameters = []): mixed
     {
-        if ($this->definitions[$class]->getIsBuilt()) {
-            return $this->definitions[$class];
+        $obj = $this->build($class);
+        if (method_exists($obj, $callable)) {
+            return $obj->$callable(...$parameters);
         }
+
+        return null;
+    }
+
+    /**
+     * @param string $class
+     * @return object
+     * @throws \ReflectionException
+     */
+    private function build(string $class): object
+    {
+        $definition = $this->definitions->get($class);
+        if ($definition->hasInstance()) {
+            return $definition->getInstance();
+        }
+
         $reflectionClass = new \ReflectionClass($class);
         $constructor = $reflectionClass->getConstructor();
+        $dependencies = [];
 
-        $parameters = $constructor->getParameters();
-
-        $types = [];
-        foreach ($parameters as $parameter) {
-            if ($parameter->getType() != 'string') {
-                $types[] = $this->build($parameter->getType());
+        if ($constructor) {
+            $parameters = $constructor->getParameters();
+            foreach ($parameters as $parameter) {
+                $dependency = $parameter->getType();
+                 if ($dependency instanceof \ReflectionNamedType && !$dependency->isBuiltin()) {
+                     $dependencies[] = $this->build($parameter->getType());
+                 }
             }
         }
-        $this->definitions[$class]->setParameters($types);
-        $this->definitions[$class]->setIsBuilt();
-        return $this->definitions[$class]->getInstance();
 
-
+        $definition->setParameters($dependencies);
+        return $definition->getInstance();
     }
 
 }

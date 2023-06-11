@@ -1,19 +1,20 @@
 <?php
 
-namespace Test;
+namespace Example;
 
-class SomeClass
+class RepositoryClass
 {
 
     public function __construct(
-        private ServiceClass $service
+        public DbClass $db
     )
     {
+
     }
 
     public function test()
     {
-        $this->service->test();
+        $this->db->test();
     }
 
 }

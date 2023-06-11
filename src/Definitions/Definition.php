@@ -2,38 +2,54 @@
 
 namespace DI\Definitions;
 
-use DI\Proxy\ProxyInstance;
-
 class Definition
 {
 
-    private ProxyInstance $instance;
-    private string $class;
-    private bool $isBuilt = false;
+    private object $instance;
+    private array $parameters;
 
-    public function __construct(string $class, \Closure $creator)
+
+    public function __construct(
+        private string $class,
+        private ?\Closure $creator
+    )
     {
-        $this->instance = new ProxyInstance($class, $creator);
     }
 
-    public function getInstance(): ProxyInstance
+    public function getInstance(): object
     {
+        if (!isset($this->instance)) {
+            $this->instance = $this->factory();
+        }
+
         return $this->instance;
+    }
+
+    public function setInstance(object $instance): void
+    {
+        $this->instance = $instance;
     }
 
     public function setParameters(array $parameters): void
     {
-        $this->instance->setParameters($parameters);
+        $this->parameters = $parameters;
     }
 
-    public function setIsBuilt(bool $isBuilt): void
+    public function hasInstance(): bool
     {
-        $this->isBuilt = $isBuilt;
+        return isset($this->instance);
     }
 
-    public function getIsBuilt(): bool
+    private function factory(): object
     {
-        return $this->isBuilt;
+        if (is_null($this->creator)) {
+            if (empty($this->parameters)) {
+                return new $this->class();
+            }
+            return new $this->class(...$this->parameters);
+        } else {
+            return ($this->creator)();
+        }
     }
 
 }

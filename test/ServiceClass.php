@@ -5,9 +5,14 @@ namespace Test;
 class ServiceClass
 {
 
+    public function __construct(
+        public RepositoryClass $repositoryClass
+    )
+    {}
+
     public function test()
     {
-        echo 'test' . PHP_EOL;
+        $this->repositoryClass->test();
     }
 
 }

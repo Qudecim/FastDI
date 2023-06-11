@@ -6,7 +6,7 @@ class ArrayDefinitions implements DefinitionsInterface
 {
 
     public function __construct(
-        array $definitions
+        private array $definitions
     )
     {
 
@@ -14,7 +14,7 @@ class ArrayDefinitions implements DefinitionsInterface
 
     public function get(): array
     {
-        return [];
+        return $this->definitions;
     }
 
 }

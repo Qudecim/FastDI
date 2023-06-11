@@ -49,8 +49,6 @@ class Container implements ContainerInterface
 
     private function build(string $class): ProxyInstance
     {
-        var_dump($class);
-        var_dump($this->definitions[$class]);
         if ($this->definitions[$class]->getIsBuilt()) {
             return $this->definitions[$class];
         }

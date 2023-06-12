@@ -19,6 +19,11 @@ class DefinitionCollection implements \IteratorAggregate, \Countable
         return $this->definitions[$id];
     }
 
+    public function has(string $id): bool
+    {
+        return isset($this->definitions[$id]);
+    }
+
     public function getIterator(): \ArrayIterator
     {
         return new \ArrayIterator($this->definitions);

@@ -1,0 +1,1 @@
+{"version":1,"defects":{"IntegrationTest\\ContainerBuilderTest::test_has":5,"IntegrationTest\\ContainerTest::test_work":7},"times":{"IntegrationTest\\ContainerBuilderTest::test_has":0.003,"IntegrationTest\\ContainerTest::test_work":0.001}}

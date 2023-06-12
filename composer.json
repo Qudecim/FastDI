@@ -16,8 +16,17 @@
             "Example\\": "example/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "TestApp\\": "tests/IntegrationTest/TestApp/",
+            "IntegrationTest\\": "tests/IntegrationTest/"
+        }
+    },
     "require": {
         "php": ">=8.0",
         "psr/container": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.2"
     }
 }

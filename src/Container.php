@@ -19,9 +19,9 @@ class Container implements ContainerInterface
      * @param string $id
      * @return mixed
      */
-    public function get(string $id): mixed
+    public function get(string $id): Definition
     {
-        return $this->definitions[$id];
+        return $this->definitions->get($id);
     }
 
     /**
@@ -30,7 +30,7 @@ class Container implements ContainerInterface
      */
     public function has(string $id): bool
     {
-        return isset($this->definitions[$id]);
+        return $this->definitions->has($id);
     }
 
     /**

@@ -16,12 +16,14 @@ class Definition
     {
     }
 
+    public function createInstance(): object
+    {
+        $this->instance = $this->factory();
+        return $this->instance;
+    }
+
     public function getInstance(): object
     {
-        if (!isset($this->instance)) {
-            $this->instance = $this->factory();
-        }
-
         return $this->instance;
     }
 

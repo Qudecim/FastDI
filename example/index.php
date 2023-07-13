@@ -11,6 +11,8 @@ $definitions = [
     }
 ];
 
-$container = \DI\ContainerBuilder::create($definitions);
-$container->call(\Example\SomeClass::class, 'test', []);
+$containerBuilder = new \DI\ContainerBuilder($definitions);
+$container = $containerBuilder->make();
+$object = $container->get(\Example\SomeClass::class);
+$object->test();
 

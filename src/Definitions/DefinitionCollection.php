@@ -2,6 +2,7 @@
 
 namespace DI\Definitions;
 
+use DI\Exceptions\DefinitionNotFoundException;
 use Traversable;
 
 class DefinitionCollection implements \IteratorAggregate, \Countable
@@ -14,8 +15,14 @@ class DefinitionCollection implements \IteratorAggregate, \Countable
         $this->definitions[$id] = $definition;
     }
 
+    /**
+     * @throws DefinitionNotFoundException
+     */
     public function get(string $id): Definition
     {
+        if (!$this->has($id)) {
+            throw new DefinitionNotFoundException();
+        }
         return $this->definitions[$id];
     }
 

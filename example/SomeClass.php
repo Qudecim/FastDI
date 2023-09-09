@@ -11,7 +11,7 @@ class SomeClass
     {
     }
 
-    public function test()
+    public function test(DbClass $dbClass)
     {
         $this->service->test();
     }

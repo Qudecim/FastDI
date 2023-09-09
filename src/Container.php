@@ -18,10 +18,31 @@ class Container implements ContainerInterface
     /**
      * @param string $id
      * @return mixed
+     * @throws \ReflectionException
      */
-    public function get(string $id): Definition
+    public function get(string $id): object
     {
-        return $this->definitions->get($id);
+        $definition = $this->definitions->get($id);
+        if ($definition->hasInstance()) {
+            return $definition->getInstance();
+        }
+
+        $reflectionClass = new \ReflectionClass($id);
+        $constructor = $reflectionClass->getConstructor();
+        $dependencies = [];
+
+        if ($constructor) {
+            $parameters = $constructor->getParameters();
+            foreach ($parameters as $parameter) {
+                $dependency = $parameter->getType();
+                if ($dependency instanceof \ReflectionNamedType && !$dependency->isBuiltin()) {
+                    $dependencies[] = $this->get($parameter->getType());
+                }
+            }
+        }
+
+        $definition->setParameters($dependencies);
+        return $definition->getInstance();
     }
 
     /**
@@ -34,25 +55,15 @@ class Container implements ContainerInterface
     }
 
     /**
-     * @param string $id
-     * @param $definition
-     * @return void
-     */
-    public function set(string $id, $definition): void
-    {
-        $this->definitions->add($id, new Definition($id, $definition));
-    }
-
-    /**
      * @param string $class
      * @param string $callable
-     * @param array $parameters
      * @return mixed
      * @throws \ReflectionException
      */
-    public function call(string $class, string $callable, array $parameters = []): mixed
+    public function call(string $class, string $callable): mixed
     {
-        $obj = $this->build($class);
+        $obj = $this->get($class);
+        $parameters = $this->getCallableParameters($class, $callable);
         if (method_exists($obj, $callable)) {
             return $obj->$callable(...$parameters);
         }
@@ -62,32 +73,19 @@ class Container implements ContainerInterface
 
     /**
      * @param string $class
-     * @return object
+     * @param string $callable
+     * @return array
      * @throws \ReflectionException
      */
-    private function build(string $class): object
+    private function getCallableParameters(string $class, string $callable): array
     {
-        $definition = $this->definitions->get($class);
-        if ($definition->hasInstance()) {
-            return $definition->getInstance();
+        $parameters = [];
+        $reflection = new \ReflectionMethod($class, $callable);
+        foreach($reflection->getParameters() as $arg) {
+            $parameters[] = $this->get($arg->getType());
         }
 
-        $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
-        $dependencies = [];
-
-        if ($constructor) {
-            $parameters = $constructor->getParameters();
-            foreach ($parameters as $parameter) {
-                $dependency = $parameter->getType();
-                 if ($dependency instanceof \ReflectionNamedType && !$dependency->isBuiltin()) {
-                     $dependencies[] = $this->build($parameter->getType());
-                 }
-            }
-        }
-
-        $definition->setParameters($dependencies);
-        return $definition->getInstance();
+        return $parameters;
     }
 
 }

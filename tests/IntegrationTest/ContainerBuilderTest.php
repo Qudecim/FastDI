@@ -9,11 +9,9 @@ class ContainerBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function test_has()
     {
-        $container = ContainerBuilder::create([
-            "foo"
-        ]);
+        \DI\ContainerBuilder::create(["foo"]);
 
-        self::assertTrue($container->has('foo'));
+        self::assertTrue(\DI\DI::has("foo"));
     }
 
 }

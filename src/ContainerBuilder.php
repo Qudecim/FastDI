@@ -12,9 +12,8 @@ class ContainerBuilder
      * Create new instance Container
      *
      * @param array $definitions
-     * @return Container
      */
-    public static function create(array $definitions): Container
+    public static function create(array $definitions): void
     {
         $definitionCollection = new DefinitionCollection();
 
@@ -29,7 +28,7 @@ class ContainerBuilder
             $definitionCollection->add($class, new Definition($class, $callable));
         }
 
-        return new Container($definitionCollection);
+        DI::make($definitionCollection);
     }
 
 }

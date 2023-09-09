@@ -18,8 +18,8 @@ class ContainerTest extends \PHPUnit\Framework\TestCase
              }
          ];
 
-         $container = \DI\ContainerBuilder::create($definitions);
-         $result = $container->call(\TestApp\SomeClass::class, 'test', []);
+         \DI\ContainerBuilder::create($definitions);
+         $result = \DI\DI::call(\TestApp\SomeClass::class, 'test');
 
          self::assertEquals($value, $result);
      }

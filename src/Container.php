@@ -42,7 +42,7 @@ class Container implements ContainerInterface
         }
 
         $definition->setParameters($dependencies);
-        return $definition->getInstance();
+        return $definition->createInstance();
     }
 
     /**

@@ -21,7 +21,7 @@ class DefinitionCollection implements \IteratorAggregate, \Countable
     public function get(string $id): Definition
     {
         if (!$this->has($id)) {
-            throw new DefinitionNotFoundException();
+            throw new DefinitionNotFoundException('Not found ' . $id);
         }
         return $this->definitions[$id];
     }
